@@ -2,11 +2,10 @@
 
 A mini online test application built with the **MERN stack** (MongoDB, Express, React, Node.js) as a take-home assignment for Infinity Classes.
 
-## Live demo / deployment status
-- **Target GitHub repo:** https://github.com/Mourya77/infinity-test-app (to be created — see note)
-- **Deploy-ready:** this repo contains everything needed for a one-service deploy (`npm install && npm run build`, then `npm start`; `render.yaml` included for Render free tier). An Antideploy application (`infinity-test-app`) has also been created for it.
-
-> Deployment note (honest status at time of writing): the app is fully built and verified locally end-to-end, but the public live link is pending two account steps — (1) the GitHub repository must be created under the owner account (the automation's GitHub App lacks repo-creation permission), and (2) a hosting slot: the Antideploy free plan's single live-server slot is in use by another app, so either that plan/slot situation changes or the repo is deployed to Render from GitHub (free tier, ~30–60s cold start after idle).
+## Live demo
+- **Live app:** https://infinity-test-app.onrender.com (Render free tier — first load after idle can take ~50s while the service wakes)
+- **GitHub repo:** https://github.com/Mourya77/infinity-test-app
+- Deployed as a single service from this repo (`render.yaml` Blueprint: `npm install && npm run build`, then `npm start`). Verified live end-to-end on 23 Nov 2026: register, login, exactly 10 questions, submit/score, review with explanations, attempt history, and admin add-question all pass (`scripts/e2e.mjs` against the live URL).
 
 ### Demo accounts (seeded automatically)
 | Role | Email | Password |

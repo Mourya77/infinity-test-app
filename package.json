@@ -1,0 +1,23 @@
+{
+  "name": "infinity-test-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mini Online Test App — MERN stack take-home for Infinity Classes",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test:e2e": "node scripts/e2e.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1"
+  },
+  "optionalDependencies": {
+    "mongodb-memory-server": "^10.0.0"
+  },
+  "engines": { "node": ">=18" }
+}

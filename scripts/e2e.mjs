@@ -1,0 +1,28 @@
+const B = process.env.BASE || 'http://localhost:4000';
+const j = async (p, o={}) => { const r = await fetch(B+p, { ...o, headers: { 'Content-Type':'application/json', ...(o.token?{Authorization:`Bearer ${o.token}`}:{}) } }); const d = await r.json().catch(()=>({})); return { s: r.status, d }; };
+const email = `e2e${Date.now()}@test.dev`; let fails = 0;
+const check = (name, cond, extra='') => { console.log(`${cond?'PASS':'FAIL'} ${name} ${extra}`); if(!cond) fails++; };
+
+let r = await j('/api/health'); check('health', r.s===200 && r.d.ok, JSON.stringify(r.d));
+r = await j('/api/auth/register', { method:'POST', body: JSON.stringify({ name:'E2E User', email, password:'secret123' }) });
+check('register', r.s===201 && !!r.d.token); const token = r.d.token;
+r = await j('/api/auth/login', { method:'POST', body: JSON.stringify({ email, password:'secret123' }) });
+check('login', r.s===200 && !!r.d.token);
+r = await j('/api/test/questions', { token });
+check('exactly 10 questions', r.s===200 && r.d.questions.length===10, `got ${r.d.questions?.length}`);
+check('no answers leaked', r.d.questions.every(q => q.correctAnswer===undefined));
+check('timer duration 600s', r.d.durationSeconds===600);
+const answers = {}; r.d.questions.forEach(q => answers[q.id]=0);
+let sub = await j('/api/test/submit', { method:'POST', token, body: JSON.stringify({ answers, durationSeconds: 42 }) });
+check('submit + score', sub.s===201 && typeof sub.d.score==='number' && sub.d.review.length===10, `score=${sub.d.score}/10`);
+check('review has explanations', sub.d.review.every(x => 'explanation' in x && 'correctAnswer' in x));
+r = await j('/api/attempts', { token });
+check('history shows attempt', r.s===200 && r.d.attempts.length===1 && r.d.attempts[0].score===sub.d.score);
+r = await j('/api/auth/login', { method:'POST', body: JSON.stringify({ email:'admin@infinityclasses.test', password:'Admin@123' }) });
+check('admin login', r.s===200 && r.d.user.isAdmin===true); const at = r.d.token;
+r = await j('/api/questions', { method:'POST', token: at, body: JSON.stringify({ question:'E2E: What is 2 + 2?', options:['3','4','5','6'], correctAnswer:1, explanation:'2 + 2 = 4.', category:'Aptitude' }) });
+check('admin add question', r.s===201);
+r = await j('/api/questions', { method:'POST', token, body: JSON.stringify({ question:'x', options:['a','b','c','d'], correctAnswer:0 }) });
+check('non-admin blocked from adding', r.s===403);
+console.log(fails ? `\n${fails} FAILURES` : '\nALL E2E CHECKS PASSED');
+process.exit(fails ? 1 : 0);
